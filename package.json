@@ -5,6 +5,8 @@
   "dependencies": {
     "antd": "^3.15.2",
     "axios": "^0.18.0",
+    "dayjs": "^1.8.12",
+    "jsonp": "^0.2.1",
     "prop-types": "15.7.2",
     "pubsub-js": "^1.7.0",
     "react": "^16.8.5",
@@ -34,5 +36,6 @@
     "less": "^3.9.0",
     "less-loader": "^4.1.0",
     "react-app-rewired": "^2.1.1"
-  }
+  },
+  "proxy": "http://localhost:5000"
 }

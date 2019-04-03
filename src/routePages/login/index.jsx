@@ -1,30 +1,48 @@
 import React, {Component} from 'react'
-import {
-  Form, Icon, Input, Button
-} from 'antd';
+import {Form, Icon, Input, Button, message} from 'antd';
+
+
+import {reqLogin} from '../../api'
+import {setItem} from '../../utils/storage-utils'
 
 import './login.less'
-import logo from './logo.png'
+import logo from '../../assets/images/logo.png'
 
 const Item = Form.Item
 
 @Form.create()
 class Login extends Component {
+  //处理提交
   handleSubmit = (e) => {
+    //禁止默认行为
     e.preventDefault()
-    this.props.form.validateFields((error,values) => {
-      if(!error){
-        console.log('提交成功')
-      }else{
+    //校验用户名与密码是否正确
+    this.props.form.validateFields(async (error, values) => {
+      if (!error) {
+        const {username, password} = values
+        //发送登入请求
+        const result = await reqLogin(username, password)
+        if (result.status === 0) {
+          message.success('登入成功')
+          setItem(result.data)
+          // 登入成功跳转到 Admin
+          this.props.history.replace('/')
+        }else {
+          message.error(result.msg,2)
+        }
+      } else {
+        console.log('***** 表单验证失败 *****')
         console.log(error)
+        console.log('***** 表单验证失败 *****')
       }
     })
   }
-
+  //自定义校验规则
   validator = (name) => {
     return (rule, value, callback) => {
       const length = value && value.length
       const userReg = /^\w+$/
+
       if (!value) {
         callback(`必须输入${name}`)
       } else if (length < 4) {
@@ -51,7 +69,7 @@ class Login extends Component {
           <h3>后台管理系统</h3>
           <Form onSubmit={this.handleSubmit} className="login-form">
             <Item>
-              {getFieldDecorator('userName', {
+              {getFieldDecorator('username', {
                 rules: [
                   {validator: this.validator('用户名')}
                 ],
