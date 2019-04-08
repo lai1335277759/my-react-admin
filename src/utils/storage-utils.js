@@ -1,22 +1,22 @@
 /**
- * 操作 storage 的模块
+ * 定义操作用户数据的方法
  */
-const USER_KEY = 'user'
-//保存用户信息的方法
-export function setItem(value) {
+const SUER_KEY = 'user'
+
+//保存用户数据
+export const setItem = (value) =>{
   if(!value || typeof value === 'function'){
-    console.log('保存数据失败',value)
-    return
+    return console.log('用户数据保存失败',value)
   }
-  localStorage.setItem(USER_KEY,JSON.stringify(value))
+  localStorage.setItem(SUER_KEY,JSON.stringify(value))
 }
-//获取用户信息的方法
-export function getItem() {
-  const user = localStorage.getItem(USER_KEY)
+//读取用户数据
+export const getItem = () =>{
+  const user = localStorage.getItem(SUER_KEY)
   if(!user)return ''
   return JSON.parse(user)
 }
-//删除用户信息的方法
-export function removeItem() {
-  localStorage.removeItem(USER_KEY)
+//删除用户数据
+export const removeItem = () =>{
+  localStorage.removeItem(SUER_KEY)
 }

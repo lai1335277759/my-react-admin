@@ -1,20 +1,21 @@
 import React, {Component} from 'react'
-import {Menu, Icon} from 'antd';
+import {Menu, Icon,} from 'antd'
 import {Link, withRouter} from 'react-router-dom'
 
-import MenuList from '../../config/menu-config'
+import menuList from '../../config/menu-config'
 
-const Item = Menu.Item
 const SubMenu = Menu.SubMenu;
+const Item = Menu.Item
+//修饰器
 @withRouter
 class LeftNav extends Component {
   constructor(props) {
     super(props)
-    const openKys = []
-    this.menus = this.createMenu(MenuList, openKys)
+    const openKeys = []
     this.state = {
-      openKys
+      openKeys
     }
+    this.menus = this.createMenu(menuList, openKeys)
   }
 
   createItem = (item) => {
@@ -27,10 +28,10 @@ class LeftNav extends Component {
       </Item>
     )
   }
-
-  createMenu = (menuList, openKys) => {
+  //创建菜单
+  createMenu = (menuList, openKeys) => {
+    const {pathname} = this.props.location
     return menuList.map((menu) => {
-      const {pathname} = this.props.location
       const children = menu.children
       if (children) {
         //二级菜单
@@ -42,7 +43,7 @@ class LeftNav extends Component {
             {
               children.map((item) => {
                 if (pathname === item.key) {
-                  openKys.push(menu.key)
+                  openKeys.push(menu.key)
                 }
                 return this.createItem(item)
               })
@@ -55,14 +56,28 @@ class LeftNav extends Component {
       }
     })
   }
-  handleOpenChange = (openKys) => {
-    this.setState({openKys})
+
+  handleOpenChange = (openKeys) => {
+    this.setState({openKeys})
+  }
+  //性能优化解决不必要的渲染
+  shouldComponentUpdate(newProps, newState) {
+    for (let key in newProps) {
+      if (newProps[key] !== this.props[key]) {
+        return true
+      }
+    }
+    if (newState.openKeys !== this.state.openKeys) {
+      return true
+    }
+    return false
   }
 
   render() {
     const {pathname} = this.props.location
+    const {openKeys} = this.state
     return (
-      <Menu theme="dark" selectedKeys={[pathname]} mode="inline" openKeys={this.state.openKys}
+      <Menu theme="dark" selectedKeys={[pathname]} mode="inline" openKeys={openKeys}
             onOpenChange={this.handleOpenChange}>
         {this.menus}
       </Menu>

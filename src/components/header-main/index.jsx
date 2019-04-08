@@ -1,48 +1,37 @@
 import React, {Component} from 'react'
-import {Row, Col, Modal, message} from 'antd';
+import {Modal,Row, Col,message} from 'antd'
 import {withRouter} from 'react-router-dom'
-import dayjs from 'dayjs';
-//获取天气的模块
+
+import menuList from '../../config/menu-config'
 import {reqWeather} from '../../api'
-//删除用户信息的工具类模块
 import {removeItem} from '../../utils/storage-utils'
 import memory from '../../utils/memory-utils'
-//定义菜单的配置模块
-import menuList from '../../config/menu-config'
-//自定义按钮模块
-import MyButton from '../my-button'
+import UpdateTime from './updatetime'
 
+import MyButton from '../my-button'
 import './index.less'
-//装饰器
 @withRouter
 class HeaderMain extends Component {
   state = {
-    sysTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
-    weatherImg: 'http://api.map.baidu.com/images/weather/day/qing.png',
-    weather: '晴'
+    weather:'晴',
+    weatherImg:'http://api.map.baidu.com/images/weather/day/qing.png'
   }
   logout = () => {
     Modal.confirm({
-      title: '您确定要退出登入吗?',
-      onOk: () => {
-        //清空用户信息
-        memory.user = {}
+      title: '您确定要退出?',
+      onOk:() => {
+        //清除localStorage 用户信息
         removeItem()
+        memory.user = {}
         //跳转到登入页面
         this.props.history.replace('/login')
       },
-      okText: '确认',
-      cancelText: '取消'
+      okText: '确定',
+      cancelText: '取消',
     })
   }
-
-  componentDidMount() {
-    this.intervalId = setInterval(() => {
-      this.setState({
-        sysTime: dayjs().format('YYYY-MM-DD HH:mm:ss')
-      })
-    }, 1000)
-    //请求天气数据
+  请求天气数据
+  componentDidMount(){
     reqWeather('深圳')
       .then(res => {
         this.setState({
@@ -52,53 +41,47 @@ class HeaderMain extends Component {
       })
       .catch(err => message.error(err, 2))
   }
-
-  componentWillUnmount() {
-    clearInterval(this.intervalId)
-  }
-
-  getTitle = () => {
+  getTitle = () =>{
     const {pathname} = this.props.location
-    for (let i = 0, length = menuList.length; i < length; i++) {
-      const menu = menuList[i];
-      const children = menu.children;
-      if (children) {
-        for (let j = 0, length = children.length; j < length; j++) {
-          let item = children[j];
-          if (item.key === pathname) {
-            return item.title;
+    for (let i = 0,len = menuList.length; i < len; i++){
+      const menu = menuList[i]
+      const children = menu.children
+      if(children){
+        for(let j = 0,len = children.length; j < len; j++){
+          const item = children[j]
+          if(pathname === item.key){
+            return item.title
           }
         }
-      } else {
-        if (pathname === menu.key) {
-          return menu.title;
+      }else{
+        if(pathname === menu.key){
+          return menu.title
         }
       }
     }
   }
-
   render() {
-    const {sysTime, weatherImg, weather} = this.state
-    //获取标题
+    //获取用户名
+    const {username} = memory.user
+    const {weather,weatherImg} = this.state
+    //获取 title
     const title = this.getTitle()
-    // 获取用户名
-    const username = memory.user.username;
-
     return (
-      <div className="header-main">
-        <Row className="header-main-top">
-          <span>欢迎,{username}</span>
+      <div>
+        <Row className='header-main-top'>
+          <span>欢迎,{username}</span>&nbsp;&nbsp;
           <MyButton onClick={this.logout}>退出</MyButton>
         </Row>
-        <Row className="header-main-botton">
-          <Col className="header-main-left" span={5}>{title}</Col>
-          <Col className="header-main-right" span={19}>
-            <span>{sysTime}</span>
+        <Row  className='header-main-bottom'>
+          <Col className='header-main-left' span={5}>{title}</Col>
+          <Col className='header-main-right' span={19}>
+            <UpdateTime />
             <img src={weatherImg} alt="天气"/>
             <span>{weather}</span>
           </Col>
         </Row>
       </div>
+
     )
   }
 }
