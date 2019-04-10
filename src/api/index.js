@@ -43,6 +43,16 @@ export const reqUpdateCategoryName = (categoryId, categoryName) => ajax(prefix +
 export const reqGetProducts = (pageNum, pageSize) => ajax(prefix + '/manage/product/list', {pageNum, pageSize})
 
 //请求添加商品
-export const reqSaveUpdateProducts = (categoryId, pCategoryId, name, price, desc) => {
-  return ajax(prefix + '/manage/product/add', {categoryId, pCategoryId, name, price, desc}, 'POST')
-}
+export const reqAddProducts = (product) => ajax(prefix + '/manage/product/add',product, 'POST')
+
+//请求删除上传图片商品
+export const reqRemoveUpload = (name,id) => ajax(prefix + '/manage/img/delete',{name,id}, 'POST')
+
+//请求修改商品
+export const reqUpdateProducts = (product) => ajax(prefix + '/manage/product/update',product, 'POST')
+
+//请求搜索商品
+export const reqSearch = (product) => ajax(prefix + '/manage/product/search',product)
+
+//请求商品详情分类名
+export const reqGetCategoryName = (categoryId) => ajax(prefix + '/manage/category/info',{categoryId})
