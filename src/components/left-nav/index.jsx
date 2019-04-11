@@ -31,6 +31,7 @@ class LeftNav extends Component {
   //创建菜单
   createMenu = (menuList, openKeys) => {
     const {pathname} = this.props.location
+    let isFirst = true;
     return menuList.map((menu) => {
       const children = menu.children
       if (children) {
@@ -42,7 +43,8 @@ class LeftNav extends Component {
           >
             {
               children.map((item) => {
-                if (pathname === item.key) {
+                if (pathname !== '/' && isFirst && (pathname.startsWith(item.key)|| item.key.startsWith(pathname))){
+                  isFirst = false;
                   openKeys.push(menu.key)
                 }
                 return this.createItem(item)
@@ -74,8 +76,11 @@ class LeftNav extends Component {
   }
 
   render() {
-    const {pathname} = this.props.location
+    let {pathname} = this.props.location
     const {openKeys} = this.state
+    if(pathname.startsWith('/product')){
+      pathname = '/product'
+    }
     return (
       <Menu theme="dark" selectedKeys={[pathname]} mode="inline" openKeys={openKeys}
             onOpenChange={this.handleOpenChange}>
