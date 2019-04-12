@@ -3,6 +3,7 @@ import {Menu, Icon,} from 'antd'
 import {Link, withRouter} from 'react-router-dom'
 
 import menuList from '../../config/menu-config'
+import memory from '../../utils/memory-utils'
 
 const SubMenu = Menu.SubMenu;
 const Item = Menu.Item
@@ -31,33 +32,39 @@ class LeftNav extends Component {
   //创建菜单
   createMenu = (menuList, openKeys) => {
     const {pathname} = this.props.location
+    const {menus} = memory.user.role
     let isFirst = true;
-    return menuList.map((menu) => {
-      const children = menu.children
-      if (children) {
-        //二级菜单
-        return (
-          <SubMenu
-            key={menu.key}
-            title={<span><Icon type={menu.icon}/><span>{menu.title}</span></span>}
+    return menuList.reduce((previous,current) => {
+      if(menus.find((menu) => menu === current.key)){
+        let children = current.children
+        if(children){
+          return [...previous,<SubMenu
+            key={current.key}
+            title={<span><Icon type={current.icon}/><span>{current.title}</span></span>}
           >
             {
-              children.map((item) => {
-                if (pathname !== '/' && isFirst && (pathname.startsWith(item.key)|| item.key.startsWith(pathname))){
-                  isFirst = false;
-                  openKeys.push(menu.key)
+              children.reduce((prev,curr) => {
+                if(menus.find((item) => item === curr.key)){
+                  if (pathname !== '/' && isFirst && (pathname.startsWith(curr.key)|| curr.key.startsWith(pathname))){
+                    isFirst = false;
+                    openKeys.push(current.key)
+                  }
+                  return [...prev,this.createItem(curr)]
+                }else{
+                  return prev
                 }
-                return this.createItem(item)
-              })
+              },[])
             }
-          </SubMenu>
-        )
-      } else {
-        //一级菜单
-        return this.createItem(menu)
+          </SubMenu>]
+        }else{
+          return [...previous,this.createItem(current)]
+        }
+      }else{
+        return previous
       }
-    })
+    },[])
   }
+
 
   handleOpenChange = (openKeys) => {
     this.setState({openKeys})
